@@ -46,7 +46,7 @@ foreach ($line in Get-Content ".env") {
     }
 }
 $required = @(
-    "QDRANT_URL", "QDRANT_API_KEY", "BGE_M3_BASE_URL",
+    "QDRANT_URL", "QDRANT_API_KEY", "EMBEDDING_BASE_URL",
     "LANGFUSE_BASE_URL", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
     "LITELLM_URL", "LITELLM_API_KEY", "AUDIT_POSTGRES_PASSWORD", "APP_PORT"
 )
@@ -59,7 +59,7 @@ if ($missing) {
 
 $composeFiles = @(
     "docker-compose.qdrant.yml",
-    "docker-compose.bge-m3.yml",
+    "docker-compose.embeddings.yml",
     "docker-compose.langfuse.yml",
     "docker-compose.yml"
 )
@@ -74,12 +74,12 @@ if ($ValidateOnly) {
 Invoke-Checked "uv" @("sync", "--extra", "dev")
 Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.qdrant.yml", "up", "-d")
 Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.langfuse.yml", "up", "-d")
-Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.bge-m3.yml", "up", "-d")
+Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.embeddings.yml", "up", "-d")
 
 Wait-Http "Qdrant" "$($config['QDRANT_URL'])/healthz" 120
 Wait-Http "Langfuse" "$($config['LANGFUSE_BASE_URL'])/api/public/health" 300
-$bgeHealth = $config["BGE_M3_BASE_URL"] -replace "/v1/?$", "/health"
-Wait-Http "RuBERT Tiny 2" $bgeHealth 1800
+$embeddingHealth = $config["EMBEDDING_BASE_URL"] -replace "/v1/?$", "/health"
+Wait-Http "RuBERT Tiny 2" $embeddingHealth 1800
 
 Invoke-Checked "uv" @("run", "python", "scripts/index_kb.py")
 Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.yml", "up", "--build", "-d")

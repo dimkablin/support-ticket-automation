@@ -23,7 +23,6 @@ class Ticket:
     query: str
     channel: Channel
     device: str
-    payload: dict[str, Any]
 
 
 @dataclass(frozen=True)

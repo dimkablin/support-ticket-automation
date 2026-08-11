@@ -159,10 +159,6 @@ def main() -> None:
     sources = source_queries()
     rows: list[dict[str, object]] = []
     KB.mkdir(parents=True, exist_ok=True)
-    (KB / "catalog.json").write_text(
-        json.dumps({theme: f"{theme}.md" for theme in THEMES}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
 
     for theme_index, (theme, config) in enumerate(THEMES.items()):
         document_id = f"kb/{theme}.md"

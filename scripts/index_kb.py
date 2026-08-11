@@ -16,8 +16,8 @@ def main() -> None:
         settings.qdrant_url,
         settings.qdrant_collection,
         settings.qdrant_api_key,
-        EmbeddingClient(settings.bge_m3_url, settings.bge_m3_model),
-        settings.bge_m3_dim,
+        EmbeddingClient(settings.embedding_url, settings.embedding_model),
+        settings.embedding_dim,
     )
     knowledge.index_documents(
         [RetrievedDocument(f"kb/{path.name}", path.read_text(encoding="utf-8")) for path in paths]

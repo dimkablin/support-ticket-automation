@@ -36,5 +36,4 @@ def normalize_ticket(
         query=query.strip(),
         channel=parsed_channel,
         device=device.strip(),
-        payload=dict(payload),
     )

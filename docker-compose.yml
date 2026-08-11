@@ -13,9 +13,9 @@ services:
       QDRANT_URL: ${QDRANT_DOCKER_URL:-http://host.docker.internal:6333}
       QDRANT_COLLECTION: ${QDRANT_COLLECTION:-support_kb_rubert_tiny2}
       QDRANT_API_KEY: ${QDRANT_API_KEY:?Set QDRANT_API_KEY in .env}
-      BGE_M3_BASE_URL: ${BGE_M3_DOCKER_URL:-http://host.docker.internal:8081/v1}
-      BGE_M3_MODEL: ${BGE_M3_MODEL:-cointegrated/rubert-tiny2}
-      BGE_M3_DIM: ${BGE_M3_DIM:-312}
+      EMBEDDING_BASE_URL: ${EMBEDDING_DOCKER_URL:-http://host.docker.internal:8081/v1}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-cointegrated/rubert-tiny2}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-312}
       REDIS_URL: redis://redis:6379/0
       POSTGRES_URL: postgresql://${AUDIT_POSTGRES_USER:-support}:${AUDIT_POSTGRES_PASSWORD:?Set AUDIT_POSTGRES_PASSWORD in .env}@postgres:5432/${AUDIT_POSTGRES_DB:-support}?connect_timeout=3
       LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:?Set LANGFUSE_PUBLIC_KEY in .env}
