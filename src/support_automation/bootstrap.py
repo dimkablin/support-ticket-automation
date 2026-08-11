@@ -1,0 +1,35 @@
+from __future__ import annotations
+
+from .classifier import ThemeClassifier
+from .knowledge import LightRAGClient
+from .persistence import PostgresAudit, RedisCache
+from .pipeline import TicketPipeline
+from .providers import FakeLLM, LiteLLMProvider
+from .settings import Settings
+
+
+def build_pipeline(settings: Settings, provider_name: str) -> TicketPipeline:
+    provider = (
+        FakeLLM()
+        if provider_name == "fake"
+        else LiteLLMProvider(
+            settings.litellm_model,
+            settings.litellm_api_base,
+            settings.litellm_api_key,
+        )
+    )
+    audit = PostgresAudit(settings.postgres_url)
+    audit.initialize()
+    return TicketPipeline(
+        classifier=ThemeClassifier.load(settings.classifier_path),
+        knowledge=LightRAGClient(settings.lightrag_url, settings.lightrag_api_key),
+        provider=provider,
+        confidence_threshold=settings.confidence_threshold,
+        cache=RedisCache(settings.redis_url),
+        audit=audit,
+        langfuse=(
+            settings.langfuse_public_key,
+            settings.langfuse_secret_key,
+            settings.langfuse_base_url,
+        ),
+    )

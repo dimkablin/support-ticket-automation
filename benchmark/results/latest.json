@@ -1,0 +1,13 @@
+{
+  "mode": "classifier-only",
+  "tickets": 60,
+  "classifier_accuracy": 0.75,
+  "classifier_macro_f1": 0.7449610574610576,
+  "classifier_top3_accuracy": 0.9333333333333333,
+  "high_risk_recall": 1.0,
+  "high_risk_false_negatives": 0,
+  "action_accuracy": 0.9833333333333333,
+  "auto_close_precision": 1.0,
+  "hot_path_p50_ms": 0.9825999877648428,
+  "hot_path_p95_ms": 1.2812000059057027
+}

@@ -1,0 +1,70 @@
+name: support-automation
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT:-8501}:8501"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      CLASSIFIER_PATH: /app/models/theme_classifier.joblib
+      LIGHTRAG_BASE_URL: ${LIGHTRAG_DOCKER_URL:-http://host.docker.internal:9621}
+      LIGHTRAG_API_KEY: ${LIGHTRAG_API_KEY:?Set LIGHTRAG_API_KEY in .env}
+      REDIS_URL: redis://redis:6379/0
+      POSTGRES_URL: postgresql://${AUDIT_POSTGRES_USER:-support}:${AUDIT_POSTGRES_PASSWORD:?Set AUDIT_POSTGRES_PASSWORD in .env}@postgres:5432/${AUDIT_POSTGRES_DB:-support}?connect_timeout=3
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:?Set LANGFUSE_PUBLIC_KEY in .env}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:?Set LANGFUSE_SECRET_KEY in .env}
+      LANGFUSE_BASE_URL: ${LANGFUSE_DOCKER_URL:-http://host.docker.internal:3000}
+      LITELLM_MODEL: ${LITELLM_MODEL:-openai/qwen3:8b}
+      LITELLM_API_BASE: ${OLLAMA_OPENAI_BASE_URL:-http://host.docker.internal:11434/v1}
+      LITELLM_API_KEY: ${OLLAMA_API_KEY:-ollama}
+      CLASSIFIER_CONFIDENCE_THRESHOLD: ${CLASSIFIER_CONFIDENCE_THRESHOLD:-0.22}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_REDIS_PORT:-6380}:6379"
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - allkeys-lru
+    volumes:
+      - support_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${AUDIT_POSTGRES_PORT:-5434}:5432"
+    environment:
+      POSTGRES_USER: ${AUDIT_POSTGRES_USER:-support}
+      POSTGRES_PASSWORD: ${AUDIT_POSTGRES_PASSWORD:?Set AUDIT_POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${AUDIT_POSTGRES_DB:-support}
+    volumes:
+      - support_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  support_redis_data:
+  support_postgres_data:
