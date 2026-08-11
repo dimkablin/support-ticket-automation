@@ -13,8 +13,12 @@ ROOT = Path(__file__).resolve().parents[2]
 class Settings:
     root: Path
     classifier_path: Path
-    lightrag_url: str
-    lightrag_api_key: str
+    qdrant_url: str
+    qdrant_collection: str
+    qdrant_api_key: str
+    bge_m3_url: str
+    bge_m3_model: str
+    bge_m3_dim: int
     redis_url: str
     postgres_url: str
     langfuse_public_key: str
@@ -33,8 +37,12 @@ class Settings:
             classifier_path=Path(
                 os.getenv("CLASSIFIER_PATH", ROOT / "models/theme_classifier.joblib")
             ),
-            lightrag_url=os.getenv("LIGHTRAG_BASE_URL", "http://localhost:9621"),
-            lightrag_api_key=os.getenv("LIGHTRAG_API_KEY", ""),
+            qdrant_url=os.getenv("QDRANT_URL", "http://localhost:6333"),
+            qdrant_collection=os.getenv("QDRANT_COLLECTION", "support_kb"),
+            qdrant_api_key=os.getenv("QDRANT_API_KEY", ""),
+            bge_m3_url=os.getenv("BGE_M3_BASE_URL", "http://localhost:8081/v1"),
+            bge_m3_model=os.getenv("BGE_M3_MODEL", "BAAI/bge-m3"),
+            bge_m3_dim=int(os.getenv("BGE_M3_DIM", "1024")),
             redis_url=os.getenv("REDIS_URL", "redis://localhost:6380/0"),
             postgres_url=os.getenv(
                 "POSTGRES_URL",

@@ -9,7 +9,7 @@ data/query_dataset.jsonl содержит 300 русских тикетов: 12 
 180 train, 60 development, 60 test.
 
 Train обучает модель, development выбирает порог 0.22, test используется один
-раз для отчёта. Тексты test не индексируются в LightRAG, иначе retrieval-метрики
+раз для отчёта. Тексты test не индексируются в Qdrant, иначе retrieval-метрики
 были бы утечкой.
 
 ## Подход
@@ -33,7 +33,7 @@ Regression. Это быстрый интерпретируемый baseline бе
 - производительность: p50/p95 классификации.
 
 Критические пороги: high-risk recall 1.0, false negative 0, auto-close
-precision не ниже 0.98, p95 меньше 500 мс; для live LightRAG дополнительно
+precision не ниже 0.98, p95 меньше 500 мс; для live hybrid retrieval дополнительно
 Recall@3 не ниже 0.90 и forbidden fact rate 0.
 
 Текущий test: accuracy 0.75, macro-F1 0.745, Top-3 0.933, high-risk recall
@@ -43,4 +43,3 @@ PoC благодаря консервативному human-in-the-loop; пер�
 
 LLM-as-a-judge не используется: он медленный, платный и может разделять ошибки
 с оцениваемой моделью. Проверки ответа основаны на размеченных фактах и токенах.
-

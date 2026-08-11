@@ -1,0 +1,15 @@
+name: support-qdrant
+
+services:
+  qdrant:
+    image: qdrant/qdrant:${QDRANT_IMAGE_TAG:-v1.18.2}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${QDRANT_PORT:-6333}:6333"
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?Set QDRANT_API_KEY in .env}
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+volumes:
+  qdrant_storage:

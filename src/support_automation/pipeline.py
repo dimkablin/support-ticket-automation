@@ -71,7 +71,7 @@ class TicketPipeline:
             try:
                 documents = self.knowledge.search(masked_query, top_k=3)
                 if not documents:
-                    raise LookupError("LightRAG не вернул документы")
+                    raise LookupError("База знаний не вернула документы")
                 document_id = documents[0].document_id
                 response = self.provider.generate(masked_query, documents[0].content)
             except Exception as error:  # noqa: BLE001 - внешние AI/RAG провайдеры обязаны деградировать

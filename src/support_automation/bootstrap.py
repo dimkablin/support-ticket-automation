@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .classifier import ThemeClassifier
 from .environment import Settings
-from .knowledge import LightRAGClient
+from .knowledge import BGEClient, QdrantKnowledgeBase
 from .persistence import PostgresAudit, RedisCache
 from .pipeline import TicketPipeline
 from .providers import FakeLLM, LiteLLMProvider
@@ -22,7 +22,13 @@ def build_pipeline(settings: Settings, provider_name: str) -> TicketPipeline:
     audit.initialize()
     return TicketPipeline(
         classifier=ThemeClassifier.load(settings.classifier_path),
-        knowledge=LightRAGClient(settings.lightrag_url, settings.lightrag_api_key),
+        knowledge=QdrantKnowledgeBase(
+            settings.qdrant_url,
+            settings.qdrant_collection,
+            settings.qdrant_api_key,
+            BGEClient(settings.bge_m3_url, settings.bge_m3_model),
+            settings.bge_m3_dim,
+        ),
         provider=provider,
         confidence_threshold=settings.confidence_threshold,
         cache=RedisCache(settings.redis_url),

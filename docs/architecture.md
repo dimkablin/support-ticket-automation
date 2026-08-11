@@ -12,7 +12,7 @@ flowchart LR
     G -->|да| H["human_review"]
     G -->|нет| T{"confidence >= 0.22<br/>и разрешённая FAQ-тема?"}
     T -->|нет| H
-    T -->|да| K["LightRAG: top-3 KB"]
+    T -->|да| K["Qdrant: dense + sparse RRF top-3"]
     G -->|черновик| K
     K --> L["FakeLLM или LiteLLM endpoint"]
     L --> D{"RAG/LLM/audit доступны?"}
@@ -58,11 +58,12 @@ Redis и не делать тысячи LLM-вызовов. В PoC этот эф
 
 ## Хранилища и границы
 
-- LightRAG хранит только 12 документов KB; benchmark-тикеты туда не попадают.
+- Qdrant хранит только 12 документов KB с dense BGE-M3 и sparse lexical-векторами;
+  benchmark-тикеты туда не попадают.
 - PostgreSQL хранит обезличенный audit trail, а не Langfuse trace.
 - Langfuse хранит обезличенные входы и служебные результаты этапов.
 - Redis хранит краткоживущий результат типового запроса.
-- BGE-M3 работает локально в Hugging Face TEI и предоставляет
-  OpenAI-compatible embeddings endpoint.
+- BGE-M3 работает локально в Hugging Face TEI и предоставляет dense-векторы через
+  OpenAI-compatible embeddings endpoint; Qdrant объединяет dense и sparse выдачи через RRF.
 - FakeLLM детерминированно извлекает проверенный ответ; LiteLLM вызывает
   настроенный пользователем OpenAI-compatible endpoint. Других LLM-реализаций нет.

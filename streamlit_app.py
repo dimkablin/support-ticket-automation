@@ -19,7 +19,7 @@ def pipeline(provider_name: str):
 
 
 st.title("Автоматизация тикетов поддержки")
-st.caption("Русскоязычный PoC: быстрый классификатор, денежный risk gate, LightRAG и аудит")
+st.caption("Русскоязычный PoC: классификатор, risk gate, hybrid Qdrant + BGE-M3 и аудит")
 
 left, right = st.columns(2)
 with left:
