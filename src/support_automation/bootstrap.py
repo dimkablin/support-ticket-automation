@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from .classifier import ThemeClassifier
 from .environment import Settings
-from .knowledge import BGEClient, QdrantKnowledgeBase
+from .knowledge import EmbeddingClient, QdrantKnowledgeBase
 from .persistence import PostgresAudit, RedisCache
 from .pipeline import TicketPipeline
 from .providers import FakeLLM, LiteLLMProvider
@@ -26,7 +26,7 @@ def build_pipeline(settings: Settings, provider_name: str) -> TicketPipeline:
             settings.qdrant_url,
             settings.qdrant_collection,
             settings.qdrant_api_key,
-            BGEClient(settings.bge_m3_url, settings.bge_m3_model),
+            EmbeddingClient(settings.bge_m3_url, settings.bge_m3_model),
             settings.bge_m3_dim,
         ),
         provider=provider,

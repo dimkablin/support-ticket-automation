@@ -1,6 +1,6 @@
 import httpx
 
-from support_automation.knowledge import BGEClient, QdrantKnowledgeBase
+from support_automation.knowledge import EmbeddingClient, QdrantKnowledgeBase
 from support_automation.models import RetrievedDocument
 
 
@@ -47,7 +47,11 @@ def test_hybrid_search_uses_dense_sparse_rrf(monkeypatch) -> None:
     monkeypatch.setattr(httpx, "get", get)
     monkeypatch.setattr(httpx, "put", put)
     knowledge = QdrantKnowledgeBase(
-        "http://qdrant:6333", "support_kb", "", BGEClient("http://bge:8081/v1", "bge"), 2
+        "http://qdrant:6333",
+        "support_kb",
+        "",
+        EmbeddingClient("http://embeddings:8081/v1", "rubert"),
+        2,
     )
 
     knowledge.index_documents([RetrievedDocument("kb/payment.md", "Оплата по СБП")])

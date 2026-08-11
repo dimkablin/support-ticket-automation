@@ -14,7 +14,7 @@ class KnowledgeBase(Protocol):
     def search(self, query: str, top_k: int = 3) -> list[RetrievedDocument]: ...
 
 
-class BGEClient:
+class EmbeddingClient:
     def __init__(self, base_url: str, model: str, timeout: float = 60.0) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
@@ -37,8 +37,8 @@ class QdrantKnowledgeBase:
         base_url: str,
         collection: str,
         api_key: str,
-        embeddings: BGEClient,
-        dimension: int = 1024,
+        embeddings: EmbeddingClient,
+        dimension: int = 312,
         timeout: float = 15.0,
     ) -> None:
         self.collection_url = f"{base_url.rstrip('/')}/collections/{quote(collection, safe='')}"
@@ -107,7 +107,9 @@ class QdrantKnowledgeBase:
         texts = [document.content for document in documents]
         dense_vectors = self.embeddings.embed(texts)
         if any(len(vector) != self.dimension for vector in dense_vectors):
-            raise ValueError(f"BGE-M3 должен вернуть dense-вектор размерности {self.dimension}")
+            raise ValueError(
+                f"Embedding service должен вернуть вектор размерности {self.dimension}"
+            )
         sparse_vectors = self._sparse(texts)
         response = httpx.put(
             f"{self.collection_url}/points?wait=true",

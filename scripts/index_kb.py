@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from support_automation.environment import Settings
-from support_automation.knowledge import BGEClient, QdrantKnowledgeBase
+from support_automation.knowledge import EmbeddingClient, QdrantKnowledgeBase
 from support_automation.models import RetrievedDocument
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +16,7 @@ def main() -> None:
         settings.qdrant_url,
         settings.qdrant_collection,
         settings.qdrant_api_key,
-        BGEClient(settings.bge_m3_url, settings.bge_m3_model),
+        EmbeddingClient(settings.bge_m3_url, settings.bge_m3_model),
         settings.bge_m3_dim,
     )
     knowledge.index_documents(

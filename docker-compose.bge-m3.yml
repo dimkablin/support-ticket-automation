@@ -8,9 +8,9 @@ services:
       - "127.0.0.1:${BGE_M3_PORT:-8081}:80"
     command:
       - --model-id
-      - ${BGE_M3_MODEL:-BAAI/bge-m3}
+      - ${BGE_M3_MODEL:-cointegrated/rubert-tiny2}
       - --served-model-name
-      - ${BGE_M3_MODEL:-BAAI/bge-m3}
+      - ${BGE_M3_MODEL:-cointegrated/rubert-tiny2}
       - --auto-truncate
     volumes:
       - bge_m3_cache:/data
@@ -24,4 +24,3 @@ services:
 
 volumes:
   bge_m3_cache:
-

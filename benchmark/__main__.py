@@ -11,7 +11,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from benchmark.metrics import fact_coverage, forbidden_fact_rate, reciprocal_rank, token_f1
 from support_automation.classifier import ThemeClassifier, load_rows
 from support_automation.environment import Settings
-from support_automation.knowledge import BGEClient, QdrantKnowledgeBase
+from support_automation.knowledge import EmbeddingClient, QdrantKnowledgeBase
 from support_automation.policy import HIGH_RISK_THEMES, decide_action
 from support_automation.providers import FakeLLM, LiteLLMProvider
 
@@ -26,7 +26,9 @@ def percentile(values: list[float], quantile: float) -> float:
 def main() -> None:
     settings = Settings.from_env()
     parser = argparse.ArgumentParser(description="Быстрый benchmark без LLM-as-a-judge")
-    parser.add_argument("--live", action="store_true", help="Проверить реальный Qdrant + BGE-M3")
+    parser.add_argument(
+        "--live", action="store_true", help="Проверить реальный Qdrant + RuBERT Tiny 2"
+    )
     parser.add_argument("--provider", choices=["fake", "litellm"], default="fake")
     args = parser.parse_args()
 
@@ -92,7 +94,7 @@ def main() -> None:
             settings.qdrant_url,
             settings.qdrant_collection,
             settings.qdrant_api_key,
-            BGEClient(settings.bge_m3_url, settings.bge_m3_model),
+            EmbeddingClient(settings.bge_m3_url, settings.bge_m3_model),
             settings.bge_m3_dim,
         )
         provider = (

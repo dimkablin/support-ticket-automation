@@ -2,7 +2,7 @@
 
 Минимальный AI/ML PoC для 200 тысяч русскоязычных тикетов в день. Он принимает
 четыре формата обращений, маскирует PII, классифицирует тему, применяет
-детерминированный денежный risk gate, получает контекст hybrid-поиском Qdrant + BGE-M3 и формирует
+детерминированный денежный risk gate, получает контекст hybrid-поиском Qdrant + RuBERT Tiny 2 и формирует
 ответ через FakeLLM или LiteLLM. Повторяющиеся запросы кэшируются в настоящем
 Redis; решения пишутся в PostgreSQL и трассируются в Langfuse.
 
@@ -21,15 +21,15 @@ Redis; решения пишутся в PostgreSQL и трассируются �
 
 Скрипт проверяет заполненный `.env`, запускает четыре Compose-проекта, ждёт
 готовности сервисов, индексирует KB и открывает приложение на <http://localhost:8501>.
-Первый запуск BGE-M3 дольше обычного, потому что Docker скачивает образ и веса модели.
+Первый запуск дольше обычного, потому что Docker скачивает TEI и веса модели.
 
-Первый запуск BGE-M3 скачивает веса в Docker volume. После готовности endpoint
+Первый запуск RuBERT Tiny 2 скачивает веса в Docker volume. После готовности endpoint
 можно проверить отдельно от Qdrant:
 
 ~~~powershell
-$body = @{ model = "BAAI/bge-m3"; input = @("проверка embeddings") } | ConvertTo-Json
+$body = @{ model = "cointegrated/rubert-tiny2"; input = @("проверка embeddings") } | ConvertTo-Json
 $result = Invoke-RestMethod -Method Post -Uri http://localhost:8081/v1/embeddings -ContentType application/json -Body $body
-$result.data[0].embedding.Count  # ожидается 1024
+$result.data[0].embedding.Count  # ожидается 312
 ~~~
 
 Интерфейс: <http://localhost:8501>, Langfuse: <http://localhost:3000>,
@@ -37,7 +37,7 @@ Qdrant Dashboard: <http://localhost:6335/dashboard>.
 
 Порядок важен: query_dataset оценивает уже построенную KB, но сам никогда не
 загружается в Qdrant. `scripts/index_kb.py` синхронно индексирует 12 документов:
-dense-векторы BGE-M3 и sparse lexical-векторы для hybrid RRF.
+dense-векторы RuBERT Tiny 2 и sparse lexical-векторы для hybrid RRF.
 
 ## Проверка
 
@@ -49,7 +49,7 @@ uv run python -m benchmark --live --provider fake
 ~~~
 
 Первый benchmark проверяет классификатор, risk gate и задержку без внешних
-сервисов. Второй делает 60 запросов к настоящим Qdrant и BGE-M3 и считает Hit@1,
+сервисов. Второй делает 60 запросов к настоящим Qdrant и RuBERT Tiny 2 и считает Hit@1,
 Recall@3, MRR, покрытие обязательных и появление запрещённых фактов. Ни одна
 метрика не использует LLM-as-a-judge. Результаты пишутся в
 benchmark/results/.
@@ -57,7 +57,7 @@ benchmark/results/.
 Текущий воспроизводимый classifier-only результат на test: accuracy 0.75,
 macro-F1 0.745, Top-3 accuracy 0.933, high-risk recall 1.0, auto-close
 precision 1.0, p95 горячего пути около 1.4 мс. Live-RAG метрики требуют
-запущенных BGE-M3, Qdrant и выбранного провайдера ответа и поэтому не подменены фиктивными числами.
+запущенных RuBERT Tiny 2, Qdrant и выбранного провайдера ответа и поэтому не подменены фиктивными числами.
 
 ## Экономика
 
@@ -85,7 +85,7 @@ precision 1.0, p95 горячего пути около 1.4 мс. Live-RAG ме�
 - kb/*.md — 12 русских документов для hybrid-поиска Qdrant;
 - src/support_automation/ — адаптеры, классификатор, policy, интеграции и pipeline;
 - streamlit_app.py — выбор канала, устройства, готового примера и провайдера;
-- четыре независимых Compose: приложение, BGE-M3, Qdrant и Langfuse.
+- четыре независимых Compose: приложение, RuBERT Tiny 2, Qdrant и Langfuse.
 
 Архитектура и ограничения описаны в [docs/architecture.md](docs/architecture.md),
 ML — в [docs/ml.md](docs/ml.md), эксплуатация — в

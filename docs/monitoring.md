@@ -7,7 +7,7 @@ PostgreSQL остаётся источником аудита решений, д
 ## Метрики
 
 - технические: RPS, очередь/lag в целевой схеме, p50/p95/p99 по этапам, доля
-  cache hit, ошибки Qdrant/BGE-M3/LiteLLM/PostgreSQL, число fallback;
+  cache hit, ошибки Qdrant/RuBERT/LiteLLM/PostgreSQL, число fallback;
 - ML: распределение тем/confidence, macro-F1 на отложенной разметке, high-risk
   false negative, Recall@3 KB, required/forbidden facts;
 - продуктовые: доля закрытых без оператора при неизменном CSAT, first response
@@ -21,7 +21,7 @@ PostgreSQL остаётся источником аудита решений, д
 - auto-close precision ниже 98% или forbidden fact rate выше 0 — остановить
   автоматическую отправку;
 - p95 классификации выше 500 мс 5 минут — проверить CPU и входной формат;
-- fallback выше 5% 10 минут — проверить BGE-M3/Qdrant/LiteLLM, оставить маршрутизацию;
+- fallback выше 5% 10 минут — проверить RuBERT/Qdrant/LiteLLM, оставить маршрутизацию;
 - дневной LLM-бюджет выше лимита — перейти на FakeLLM/шаблон и human review.
 
 Дрифт отделяется от изменения потока: сначала сравниваются каналы, темы и длина

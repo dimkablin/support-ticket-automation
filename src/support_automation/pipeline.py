@@ -19,7 +19,7 @@ FALLBACK_RESPONSE = "Автоматическая обработка време�
 
 
 class TicketPipeline:
-    kb_version = "kb-v1"
+    kb_version = "kb-v2-rubert-tiny2"
 
     def __init__(
         self,

@@ -38,11 +38,11 @@ class Settings:
                 os.getenv("CLASSIFIER_PATH", ROOT / "models/theme_classifier.joblib")
             ),
             qdrant_url=os.getenv("QDRANT_URL", "http://localhost:6333"),
-            qdrant_collection=os.getenv("QDRANT_COLLECTION", "support_kb"),
+            qdrant_collection=os.getenv("QDRANT_COLLECTION", "support_kb_rubert_tiny2"),
             qdrant_api_key=os.getenv("QDRANT_API_KEY", ""),
             bge_m3_url=os.getenv("BGE_M3_BASE_URL", "http://localhost:8081/v1"),
-            bge_m3_model=os.getenv("BGE_M3_MODEL", "BAAI/bge-m3"),
-            bge_m3_dim=int(os.getenv("BGE_M3_DIM", "1024")),
+            bge_m3_model=os.getenv("BGE_M3_MODEL", "cointegrated/rubert-tiny2"),
+            bge_m3_dim=int(os.getenv("BGE_M3_DIM", "312")),
             redis_url=os.getenv("REDIS_URL", "redis://localhost:6380/0"),
             postgres_url=os.getenv(
                 "POSTGRES_URL",

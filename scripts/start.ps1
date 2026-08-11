@@ -79,7 +79,7 @@ Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose
 Wait-Http "Qdrant" "$($config['QDRANT_URL'])/healthz" 120
 Wait-Http "Langfuse" "$($config['LANGFUSE_BASE_URL'])/api/public/health" 300
 $bgeHealth = $config["BGE_M3_BASE_URL"] -replace "/v1/?$", "/health"
-Wait-Http "BGE-M3" $bgeHealth 1800
+Wait-Http "RuBERT Tiny 2" $bgeHealth 1800
 
 Invoke-Checked "uv" @("run", "python", "scripts/index_kb.py")
 Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.yml", "up", "--build", "-d")
