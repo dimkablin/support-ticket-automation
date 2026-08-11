@@ -16,22 +16,12 @@ Redis; решения пишутся в PostgreSQL и трассируются �
 На этой машине Compose настроен для RTX 5070 Ti.
 
 ~~~powershell
-Copy-Item .env.example .env
-# Замените все CHANGE_ME и нулевой LANGFUSE_ENCRYPTION_KEY.
-
-uv sync --extra dev
-uv run python scripts/prepare_dataset.py
-uv run python scripts/train_classifier.py
-
-# Укажите LITELLM_* в .env.
-docker compose --env-file .env -f docker-compose.bge-m3.yml up -d
-
-docker compose --env-file .env -f docker-compose.langfuse.yml up -d
-docker compose --env-file .env -f docker-compose.qdrant.yml up -d
-uv run python scripts/index_kb.py
-
-docker compose --env-file .env -f docker-compose.yml up --build -d
+.\scripts\start.ps1
 ~~~
+
+Скрипт проверяет заполненный `.env`, запускает четыре Compose-проекта, ждёт
+готовности сервисов, индексирует KB и открывает приложение на <http://localhost:8501>.
+Первый запуск BGE-M3 дольше обычного, потому что Docker скачивает образ и веса модели.
 
 Первый запуск BGE-M3 скачивает веса в Docker volume. После готовности endpoint
 можно проверить отдельно от Qdrant:
@@ -43,7 +33,7 @@ $result.data[0].embedding.Count  # ожидается 1024
 ~~~
 
 Интерфейс: <http://localhost:8501>, Langfuse: <http://localhost:3000>,
-Qdrant Dashboard: <http://localhost:6333/dashboard>.
+Qdrant Dashboard: <http://localhost:6335/dashboard>.
 
 Порядок важен: query_dataset оценивает уже построенную KB, но сам никогда не
 загружается в Qdrant. `scripts/index_kb.py` синхронно индексирует 12 документов:

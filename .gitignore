@@ -4,8 +4,3 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
-
-# Local LightRAG data if bind mounts are added later.
-data/rag_storage/
-data/inputs/
-data/prompts/
