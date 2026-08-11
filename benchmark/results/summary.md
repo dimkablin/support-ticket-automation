@@ -1,13 +1,20 @@
 # Результат benchmark
 
-- mode: classifier-only
+- mode: live
 - tickets: 60
 - classifier_accuracy: 0.7500
 - classifier_macro_f1: 0.7450
 - classifier_top3_accuracy: 0.9333
 - high_risk_recall: 1.0000
 - high_risk_false_negatives: 0
-- action_accuracy: 0.9833
-- auto_close_precision: 1.0000
-- hot_path_p50_ms: 0.9826
-- hot_path_p95_ms: 1.2812
+- action_accuracy: 0.7667
+- auto_reply_precision: 1.0000
+- hot_path_p50_ms: 0.7729
+- hot_path_p95_ms: 1.9542
+- retrieval_hit_at_1: 0.3833
+- retrieval_recall_at_3: 0.5833
+- retrieval_mrr: 0.4694
+- evaluated_answers: 26
+- required_fact_coverage: 0.5962
+- forbidden_fact_rate: 0.0000
+- answer_token_f1: 0.7311

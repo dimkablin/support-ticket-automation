@@ -1,0 +1,8 @@
+FROM support-automation-app:latest
+
+WORKDIR /app
+COPY src ./src
+RUN pip install --no-cache-dir "pika>=1.3" "prometheus-client>=0.22"
+ENV PYTHONPATH=/app/src
+
+CMD ["python", "-m", "support_automation.worker"]

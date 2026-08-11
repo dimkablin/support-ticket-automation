@@ -50,7 +50,9 @@ foreach ($line in Get-Content ".env") {
 $required = @(
     "QDRANT_URL", "QDRANT_API_KEY", "EMBEDDING_BASE_URL",
     "LANGFUSE_BASE_URL", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
-    "LITELLM_URL", "LITELLM_API_KEY", "AUDIT_POSTGRES_PASSWORD", "APP_PORT"
+    "LITELLM_URL", "LITELLM_API_KEY", "AUDIT_POSTGRES_PASSWORD", "APP_PORT",
+    "RABBITMQ_URL", "RABBITMQ_DOCKER_URL", "RABBITMQ_PASSWORD",
+    "RABBITMQ_MANAGEMENT_PORT", "WORKER_METRICS_PORT"
 )
 $missing = @($required | Where-Object {
     -not $config.ContainsKey($_) -or [string]::IsNullOrWhiteSpace($config[$_])
@@ -63,6 +65,7 @@ $composeFiles = @(
     "docker-compose.qdrant.yml",
     "docker-compose.embeddings.yml",
     "docker-compose.langfuse.yml",
+    "docker-compose.rabbitmq.yml",
     "docker-compose.yml"
 )
 foreach ($file in $composeFiles) {
@@ -86,7 +89,11 @@ Wait-Http "RuBERT Tiny 2" $embeddingHealth 1800
 Invoke-Checked "uv" @("run", "python", "scripts/index_kb.py")
 Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.yml", "up", "--build", "-d")
 Wait-Http "Streamlit" "http://localhost:$($config['APP_PORT'])/_stcore/health" 180
+Invoke-Checked "docker" @("compose", "--env-file", ".env", "-f", "docker-compose.rabbitmq.yml", "up", "--build", "-d")
+Wait-Http "RabbitMQ" "http://localhost:$($config['RABBITMQ_MANAGEMENT_PORT'])" 180
+Wait-Http "Queue worker metrics" "http://localhost:$($config['WORKER_METRICS_PORT'])/metrics" 180
 
 Write-Host "Ready: http://localhost:$($config['APP_PORT'])"
 Write-Host "Langfuse: $($config['LANGFUSE_BASE_URL'])"
 Write-Host "Qdrant: $($config['QDRANT_URL'])/dashboard"
+Write-Host "RabbitMQ: http://localhost:$($config['RABBITMQ_MANAGEMENT_PORT'])"

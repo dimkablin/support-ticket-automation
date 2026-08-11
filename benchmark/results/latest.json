@@ -1,5 +1,5 @@
 {
-  "mode": "classifier-only",
+  "mode": "live",
   "tickets": 60,
   "classifier_accuracy": 0.75,
   "classifier_macro_f1": 0.7449610574610576,
@@ -8,6 +8,13 @@
   "high_risk_false_negatives": 0,
   "action_accuracy": 0.7666666666666667,
   "auto_reply_precision": 1.0,
-  "hot_path_p50_ms": 0.9518000006210059,
-  "hot_path_p95_ms": 2.067399997031316
+  "hot_path_p50_ms": 0.7729499920969829,
+  "hot_path_p95_ms": 1.9542000081855804,
+  "retrieval_hit_at_1": 0.38333333333333336,
+  "retrieval_recall_at_3": 0.5833333333333334,
+  "retrieval_mrr": 0.46944444444444444,
+  "evaluated_answers": 26,
+  "required_fact_coverage": 0.5961538461538461,
+  "forbidden_fact_rate": 0.0,
+  "answer_token_f1": 0.7310860558295912
 }

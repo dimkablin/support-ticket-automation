@@ -28,6 +28,11 @@ class Settings:
     litellm_api_base: str
     litellm_api_key: str
     confidence_threshold: float
+    rabbitmq_url: str
+    rabbitmq_max_length: int
+    rabbitmq_prefetch: int
+    llm_concurrency: int
+    worker_metrics_port: int
 
     @classmethod
     def from_env(cls, env_file: Path | None = None) -> Settings:
@@ -55,4 +60,9 @@ class Settings:
             litellm_api_base=os.getenv("LITELLM_URL", "http://host.docker.internal:4000/v1"),
             litellm_api_key=os.getenv("LITELLM_API_KEY", ""),
             confidence_threshold=float(os.getenv("CLASSIFIER_CONFIDENCE_THRESHOLD", "0.22")),
+            rabbitmq_url=os.getenv("RABBITMQ_URL", "amqp://support:support@localhost:5673/%2F"),
+            rabbitmq_max_length=int(os.getenv("RABBITMQ_MAX_LENGTH", "50000")),
+            rabbitmq_prefetch=int(os.getenv("RABBITMQ_PREFETCH", "1")),
+            llm_concurrency=int(os.getenv("LLM_CONCURRENCY", "2")),
+            worker_metrics_port=int(os.getenv("WORKER_METRICS_PORT", "9100")),
         )
