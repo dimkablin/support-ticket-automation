@@ -20,7 +20,7 @@ services:
 
       # Generation and embeddings deliberately use different OpenAI-compatible endpoints.
       LLM_BINDING: openai
-      LLM_BINDING_HOST: ${LITELLM_DOCKER_URL:?Set LITELLM_DOCKER_URL in .env}
+      LLM_BINDING_HOST: ${LITELLM_URL:?Set LITELLM_URL in .env}
       LLM_BINDING_API_KEY: ${LITELLM_API_KEY:?Set LITELLM_API_KEY in .env}
       LLM_MODEL: ${LIGHTRAG_LLM_MODEL:?Set LIGHTRAG_LLM_MODEL in .env}
       MAX_TOTAL_TOKENS: ${LIGHTRAG_MAX_TOTAL_TOKENS:-12000}
