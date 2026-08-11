@@ -1,0 +1,14 @@
+{
+  "payment_methods": "payment_methods.md",
+  "pricing": "pricing.md",
+  "invoice_download": "invoice_download.md",
+  "subscription_cancel": "subscription_cancel.md",
+  "password_reset": "password_reset.md",
+  "verification_help": "verification_help.md",
+  "technical_issue": "technical_issue.md",
+  "service_unavailable": "service_unavailable.md",
+  "duplicate_charge": "duplicate_charge.md",
+  "fraud_suspected": "fraud_suspected.md",
+  "refund_missing": "refund_missing.md",
+  "payment_dispute": "payment_dispute.md"
+}
