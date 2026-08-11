@@ -205,7 +205,9 @@ def main() -> None:
                     ],
                     "high_risk": risk,
                     "expected_action": (
-                        "auto_close"
+                        "human_need"
+                        if risk
+                        else "auto_reply"
                         if theme
                         in {
                             "payment_methods",
@@ -213,7 +215,7 @@ def main() -> None:
                             "invoice_download",
                             "subscription_cancel",
                         }
-                        else "human_review"
+                        else "approve_require"
                     ),
                     "expected_document_id": document_id,
                     "channel": channel,
@@ -230,7 +232,12 @@ def main() -> None:
     assert len({row["id"] for row in rows}) == 300
     assert all(sum(row["theme"] == theme for row in rows) == 25 for theme in THEMES)
     assert sum(row["high_risk"] for row in rows) == 100
-    assert {row["expected_action"] for row in rows if row["high_risk"]} == {"human_review"}
+    assert {row["expected_action"] for row in rows} == {
+        "auto_reply",
+        "approve_require",
+        "human_need",
+    }
+    assert {row["expected_action"] for row in rows if row["high_risk"]} == {"human_need"}
     assert {
         split: sum(row["split"] == split for row in rows)
         for split in ("train", "development", "test")

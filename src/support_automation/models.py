@@ -13,8 +13,9 @@ class Channel(StrEnum):
 
 
 class Action(StrEnum):
-    AUTO_CLOSE = "auto_close"
-    HUMAN_REVIEW = "human_review"
+    AUTO_REPLY = "auto_reply"
+    APPROVE_REQUIRE = "approve_require"
+    HUMAN_NEED = "human_need"
 
 
 @dataclass(frozen=True)

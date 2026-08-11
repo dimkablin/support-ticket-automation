@@ -50,21 +50,41 @@ if st.button("Обработать тикет", type="primary"):
     except Exception as error:  # noqa: BLE001 - UI показывает ошибку окружения
         st.error(f"Не удалось запустить окружение: {error}")
     else:
-        status = "Автозакрытие" if decision.action.value == "auto_close" else "Проверка оператором"
-        st.subheader(status)
-        a, b, c, d = st.columns(4)
-        a.metric("Тема", decision.classification.theme)
-        b.metric("Уверенность", f"{decision.classification.confidence:.1%}")
-        c.metric("Денежный риск", "Да" if decision.high_risk else "Нет")
-        d.metric("Задержка", f"{decision.latency_ms:.0f} мс")
-        st.write(decision.response)
-        st.json(
-            {
-                "top3": decision.classification.top3,
-                "document_id": decision.document_id,
-                "cache_hit": decision.cache_hit,
-                "trace_id": decision.trace_id,
-                "fallback_reason": decision.fallback_reason,
-                "masked_query": decision.masked_query,
-            }
-        )
+        st.session_state["decision"] = decision
+
+decision = st.session_state.get("decision")
+if decision:
+    statuses = {
+        "auto_reply": "Автоматический ответ",
+        "approve_require": "Черновик требует одобрения",
+        "human_need": "Нужен оператор",
+    }
+    st.subheader(statuses[decision.action.value])
+    a, b, c, d = st.columns(4)
+    a.metric("Тема", decision.classification.theme)
+    b.metric("Уверенность", f"{decision.classification.confidence:.1%}")
+    c.metric("Денежный риск", "Да" if decision.high_risk else "Нет")
+    d.metric("Задержка", f"{decision.latency_ms:.0f} мс")
+    st.write(decision.response)
+
+    if decision.action.value == "auto_reply":
+        st.success("Ответ готов к автоматической отправке пользователю.")
+    elif decision.action.value == "approve_require":
+        approve, reject = st.columns(2)
+        if approve.button("Одобрить и отправить", type="primary"):
+            st.success("Оператор одобрил ответ: он готов к отправке.")
+        if reject.button("Отклонить и забрать тикет"):
+            st.warning("Черновик отклонён, тикет передан оператору.")
+    else:
+        st.warning("LLM не вызывался: тикет сразу передан оператору.")
+
+    st.json(
+        {
+            "top3": decision.classification.top3,
+            "document_id": decision.document_id,
+            "cache_hit": decision.cache_hit,
+            "trace_id": decision.trace_id,
+            "fallback_reason": decision.fallback_reason,
+            "masked_query": decision.masked_query,
+        }
+    )

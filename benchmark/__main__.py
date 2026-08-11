@@ -56,13 +56,13 @@ def main() -> None:
         / risk_positives
     )
     predicted_actions = [decide_action(prediction)[1].value for prediction in predictions]
-    auto_close_indexes = [
-        index for index, action in enumerate(predicted_actions) if action == "auto_close"
+    auto_reply_indexes = [
+        index for index, action in enumerate(predicted_actions) if action == "auto_reply"
     ]
-    auto_close_precision = (
-        sum(rows[index]["expected_action"] == "auto_close" for index in auto_close_indexes)
-        / len(auto_close_indexes)
-        if auto_close_indexes
+    auto_reply_precision = (
+        sum(rows[index]["expected_action"] == "auto_reply" for index in auto_reply_indexes)
+        / len(auto_reply_indexes)
+        if auto_reply_indexes
         else 1.0
     )
 
@@ -84,7 +84,7 @@ def main() -> None:
         "action_accuracy": accuracy_score(
             [row["expected_action"] for row in rows], predicted_actions
         ),
-        "auto_close_precision": auto_close_precision,
+        "auto_reply_precision": auto_reply_precision,
         "hot_path_p50_ms": statistics.median(latencies),
         "hot_path_p95_ms": percentile(latencies, 0.95),
     }
@@ -112,12 +112,14 @@ def main() -> None:
         coverage: list[float] = []
         forbidden: list[float] = []
         answer_f1: list[float] = []
-        for row in rows:
+        for row, action in zip(rows, predicted_actions, strict=True):
             documents = knowledge.search(row["query"], top_k=3)
             ids = [document.document_id for document in documents]
             ranks.append(reciprocal_rank(row["expected_document_id"], ids))
             hit1.append(bool(ids) and ids[0] == row["expected_document_id"])
             recall3.append(row["expected_document_id"] in ids)
+            if action == "human_need":
+                continue
             answer = provider.generate(row["query"], documents[0].content) if documents else ""
             coverage.append(fact_coverage(answer, row["required_facts"]))
             forbidden.append(forbidden_fact_rate(answer, row["forbidden_facts"]))
@@ -127,6 +129,7 @@ def main() -> None:
                 "retrieval_hit_at_1": sum(hit1) / len(hit1),
                 "retrieval_recall_at_3": sum(recall3) / len(recall3),
                 "retrieval_mrr": statistics.mean(ranks),
+                "evaluated_answers": len(coverage),
                 "required_fact_coverage": statistics.mean(coverage),
                 "forbidden_fact_rate": statistics.mean(forbidden),
                 "answer_token_f1": statistics.mean(answer_f1),
@@ -149,7 +152,7 @@ def main() -> None:
     failed = (
         results["high_risk_recall"] < 1.0
         or results["high_risk_false_negatives"] != 0
-        or results["auto_close_precision"] < 0.98
+        or results["auto_reply_precision"] < 0.98
         or results["hot_path_p95_ms"] >= 500
         or (
             args.live

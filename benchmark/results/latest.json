@@ -6,8 +6,8 @@
   "classifier_top3_accuracy": 0.9333333333333333,
   "high_risk_recall": 1.0,
   "high_risk_false_negatives": 0,
-  "action_accuracy": 0.9833333333333333,
-  "auto_close_precision": 1.0,
-  "hot_path_p50_ms": 0.9825999877648428,
-  "hot_path_p95_ms": 1.2812000059057027
+  "action_accuracy": 0.7666666666666667,
+  "auto_reply_precision": 1.0,
+  "hot_path_p50_ms": 0.9518000006210059,
+  "hot_path_p95_ms": 2.067399997031316
 }

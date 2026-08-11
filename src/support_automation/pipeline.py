@@ -16,10 +16,11 @@ from .providers import LLMProvider
 from .tracing import TicketTrace
 
 FALLBACK_RESPONSE = "Автоматическая обработка временно недоступна. Тикет передан оператору."
+HUMAN_NEED_RESPONSE = "Тикет передан оператору без генерации ответа."
 
 
 class TicketPipeline:
-    kb_version = "kb-v2-rubert-tiny2"
+    kb_version = "kb-v3-rubert-tiny2-actions"
 
     def __init__(
         self,
@@ -57,9 +58,9 @@ class TicketPipeline:
                 decision = self._from_cache(
                     cached, ticket.id, channel, ticket.device, started, trace.trace_id
                 )
-                if not self._audit(decision) and decision.action is Action.AUTO_CLOSE:
+                if not self._audit(decision) and decision.action is not Action.HUMAN_NEED:
                     decision = replace(
-                        decision, action=Action.HUMAN_REVIEW, fallback_reason="AuditUnavailable"
+                        decision, action=Action.HUMAN_NEED, fallback_reason="AuditUnavailable"
                     )
                 trace.finish(self._trace_output(decision))
                 return decision
@@ -68,16 +69,18 @@ class TicketPipeline:
             high_risk, action = decide_action(classification, self.confidence_threshold)
             document_id: str | None = None
             fallback_reason: str | None = None
-            try:
-                documents = self.knowledge.search(masked_query, top_k=3)
-                if not documents:
-                    raise LookupError("База знаний не вернула документы")
-                document_id = documents[0].document_id
-                response = self.provider.generate(masked_query, documents[0].content)
-            except Exception as error:  # noqa: BLE001 - внешние AI/RAG провайдеры обязаны деградировать
-                action = Action.HUMAN_REVIEW
-                response = FALLBACK_RESPONSE
-                fallback_reason = type(error).__name__
+            response = HUMAN_NEED_RESPONSE
+            if action is not Action.HUMAN_NEED:
+                try:
+                    documents = self.knowledge.search(masked_query, top_k=3)
+                    if not documents:
+                        raise LookupError("База знаний не вернула документы")
+                    document_id = documents[0].document_id
+                    response = self.provider.generate(masked_query, documents[0].content)
+                except Exception as error:  # noqa: BLE001 - внешние AI/RAG провайдеры обязаны деградировать
+                    action = Action.HUMAN_NEED
+                    response = FALLBACK_RESPONSE
+                    fallback_reason = type(error).__name__
 
             decision = Decision(
                 ticket_id=ticket.id,
@@ -95,10 +98,10 @@ class TicketPipeline:
                 fallback_reason=fallback_reason,
             )
             audit_ok = self._audit(decision)
-            if not audit_ok and decision.action is Action.AUTO_CLOSE:
+            if not audit_ok and decision.action is not Action.HUMAN_NEED:
                 decision = replace(
                     decision,
-                    action=Action.HUMAN_REVIEW,
+                    action=Action.HUMAN_NEED,
                     fallback_reason="AuditUnavailable",
                 )
             elif audit_ok:
@@ -132,7 +135,7 @@ class TicketPipeline:
         try:
             self.audit.write(decision, self.classifier.version, self.kb_version)
             return True
-        except Exception:  # noqa: BLE001 - сбой аудита меняет auto-close на human review
+        except Exception:  # noqa: BLE001 - сбой аудита меняет auto_reply на human_need
             return False
 
     @staticmethod

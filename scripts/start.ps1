@@ -16,10 +16,12 @@ function Wait-Http([string]$Name, [string]$Url, [int]$TimeoutSeconds) {
     $watch = [Diagnostics.Stopwatch]::StartNew()
     $nextReport = 30
     while ($watch.Elapsed.TotalSeconds -lt $TimeoutSeconds) {
-        & curl.exe --fail --silent --show-error --max-time 5 --output NUL $Url 2>$null
-        if ($LASTEXITCODE -eq 0) {
+        try {
+            Invoke-WebRequest -UseBasicParsing -Uri $Url -TimeoutSec 5 | Out-Null
             Write-Host "$Name is ready"
             return
+        } catch {
+            # Service startup failures are expected until the timeout expires.
         }
         if ($watch.Elapsed.TotalSeconds -ge $nextReport) {
             Write-Host "$Name is still starting ($([int]$watch.Elapsed.TotalSeconds) s)"
@@ -30,7 +32,7 @@ function Wait-Http([string]$Name, [string]$Url, [int]$TimeoutSeconds) {
     throw "$Name was not ready after $TimeoutSeconds seconds"
 }
 
-foreach ($command in @("docker", "uv", "curl.exe")) {
+foreach ($command in @("docker", "uv")) {
     if (-not (Get-Command $command -ErrorAction SilentlyContinue)) {
         throw "Command not found: $command"
     }
