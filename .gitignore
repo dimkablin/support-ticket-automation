@@ -1,0 +1,6 @@
+.env
+
+# Local LightRAG data if bind mounts are added later.
+data/rag_storage/
+data/inputs/
+data/prompts/

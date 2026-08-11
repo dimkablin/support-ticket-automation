@@ -1,0 +1,58 @@
+name: support-lightrag
+
+services:
+  lightrag:
+    image: ghcr.io/hkuds/lightrag:${LIGHTRAG_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${LIGHTRAG_PORT:-9621}:9621"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "9621"
+      WEBUI_TITLE: ${LIGHTRAG_WEBUI_TITLE:-Support Ticket Knowledge Base}
+      WORKING_DIR: /app/data/rag_storage
+      INPUT_DIR: /app/data/inputs
+      PROMPT_DIR: /app/data/prompts
+      LIGHTRAG_API_KEY: ${LIGHTRAG_API_KEY:?Set LIGHTRAG_API_KEY in .env}
+      SUMMARY_LANGUAGE: ${LIGHTRAG_SUMMARY_LANGUAGE:-Russian}
+
+      # Ollama exposes an OpenAI-compatible API on /v1.
+      LLM_BINDING: openai
+      LLM_BINDING_HOST: ${OLLAMA_OPENAI_BASE_URL:-http://host.docker.internal:11434/v1}
+      LLM_BINDING_API_KEY: ${OLLAMA_API_KEY:-ollama}
+      LLM_MODEL: ${OLLAMA_LLM_MODEL:-qwen3:8b}
+      MAX_TOTAL_TOKENS: ${LIGHTRAG_MAX_TOTAL_TOKENS:-12000}
+
+      EMBEDDING_BINDING: openai
+      EMBEDDING_BINDING_HOST: ${OLLAMA_OPENAI_BASE_URL:-http://host.docker.internal:11434/v1}
+      EMBEDDING_BINDING_API_KEY: ${OLLAMA_API_KEY:-ollama}
+      EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3}
+      EMBEDDING_DIM: ${OLLAMA_EMBEDDING_DIM:-1024}
+      EMBEDDING_SEND_DIM: "false"
+
+      # LightRAG traces OpenAI-compatible calls to the separate Langfuse stack.
+      LANGFUSE_ENABLE_TRACE: ${LANGFUSE_ENABLE_TRACE:-true}
+      LANGFUSE_HOST: ${LANGFUSE_DOCKER_URL:-http://host.docker.internal:3000}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:?Set LANGFUSE_PUBLIC_KEY in .env}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:?Set LANGFUSE_SECRET_KEY in .env}
+    volumes:
+      - lightrag_storage:/app/data/rag_storage
+      - lightrag_inputs:/app/data/inputs
+      - lightrag_prompts:/app/data/prompts
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:9621/health', timeout=5)"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  lightrag_storage:
+  lightrag_inputs:
+  lightrag_prompts:
