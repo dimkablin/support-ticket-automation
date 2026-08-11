@@ -9,6 +9,7 @@ dependencies = [
   "langfuse>=3.9",
   "litellm>=1.75",
   "psycopg[binary]>=3.2",
+  "python-dotenv>=1.2",
   "redis>=6.2",
   "scikit-learn>=1.7",
   "streamlit>=1.48",
@@ -31,4 +32,3 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-

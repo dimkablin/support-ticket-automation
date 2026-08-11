@@ -4,6 +4,10 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[2]
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -22,16 +26,16 @@ class Settings:
     confidence_threshold: float
 
     @classmethod
-    def from_env(cls) -> Settings:
-        root = Path(__file__).resolve().parents[2]
+    def from_env(cls, env_file: Path | None = None) -> Settings:
+        load_dotenv(env_file or ROOT / ".env", override=False)
         return cls(
-            root=root,
+            root=ROOT,
             classifier_path=Path(
-                os.getenv("CLASSIFIER_PATH", root / "models/theme_classifier.joblib")
+                os.getenv("CLASSIFIER_PATH", ROOT / "models/theme_classifier.joblib")
             ),
             lightrag_url=os.getenv("LIGHTRAG_BASE_URL", "http://localhost:9621"),
             lightrag_api_key=os.getenv("LIGHTRAG_API_KEY", ""),
-            redis_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+            redis_url=os.getenv("REDIS_URL", "redis://localhost:6380/0"),
             postgres_url=os.getenv(
                 "POSTGRES_URL",
                 "postgresql://support:support@localhost:5434/support?connect_timeout=3",

@@ -6,7 +6,7 @@ import streamlit as st
 
 from support_automation.bootstrap import build_pipeline
 from support_automation.classifier import load_rows
-from support_automation.settings import Settings
+from support_automation.environment import Settings
 
 st.set_page_config(page_title="Автоматизация тикетов", page_icon="🎫", layout="wide")
 settings = Settings.from_env()

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from .classifier import ThemeClassifier
+from .environment import Settings
 from .knowledge import LightRAGClient
 from .persistence import PostgresAudit, RedisCache
 from .pipeline import TicketPipeline
 from .providers import FakeLLM, LiteLLMProvider
-from .settings import Settings
 
 
 def build_pipeline(settings: Settings, provider_name: str) -> TicketPipeline:

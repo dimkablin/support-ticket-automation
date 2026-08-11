@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 import argparse
-import os
 from pathlib import Path
 
 import httpx
+
+from support_automation.environment import Settings
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
+    settings = Settings.from_env()
     parser = argparse.ArgumentParser(description="Загрузить русскую KB в LightRAG")
-    parser.add_argument("--url", default=os.getenv("LIGHTRAG_BASE_URL", "http://localhost:9621"))
-    parser.add_argument("--api-key", default=os.getenv("LIGHTRAG_API_KEY", ""))
+    parser.add_argument("--url", default=settings.lightrag_url)
+    parser.add_argument("--api-key", default=settings.lightrag_api_key)
     args = parser.parse_args()
 
     headers = {"X-API-Key": args.api_key}

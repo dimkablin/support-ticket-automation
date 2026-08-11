@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from support_automation.classifier import ThemeClassifier, load_rows
+from support_automation.environment import Settings
 from support_automation.models import Action, RetrievedDocument
 from support_automation.pipeline import FALLBACK_RESPONSE, TicketPipeline
 from support_automation.privacy import mask_pii
@@ -18,6 +19,7 @@ class StaticKnowledge:
 
 
 def test_happy_path_risk_gate_and_fallback() -> None:
+    assert Settings.from_env().root == ROOT
     classifier = ThemeClassifier.train(load_rows(ROOT / "data" / "query_dataset.jsonl"))
     content = (ROOT / "kb" / "payment_methods.md").read_text(encoding="utf-8")
     safe = TicketPipeline(classifier, StaticKnowledge(content), FakeLLM(), confidence_threshold=0)
