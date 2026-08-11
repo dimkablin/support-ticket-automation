@@ -14,7 +14,7 @@ flowchart LR
     T -->|нет| H
     T -->|да| K["LightRAG: top-3 KB"]
     G -->|черновик| K
-    K --> L["FakeLLM или LiteLLM → Ollama"]
+    K --> L["FakeLLM или LiteLLM endpoint"]
     L --> D{"RAG/LLM/audit доступны?"}
     D -->|да, безопасный FAQ| X["auto_close"]
     D -->|нет или risky| H
@@ -62,6 +62,7 @@ Redis и не делать тысячи LLM-вызовов. В PoC этот эф
 - PostgreSQL хранит обезличенный audit trail, а не Langfuse trace.
 - Langfuse хранит обезличенные входы и служебные результаты этапов.
 - Redis хранит краткоживущий результат типового запроса.
+- BGE-M3 работает локально в Hugging Face TEI и предоставляет
+  OpenAI-compatible embeddings endpoint.
 - FakeLLM детерминированно извлекает проверенный ответ; LiteLLM вызывает
-  OpenAI-compatible Ollama. Других LLM-реализаций нет.
-
+  настроенный пользователем OpenAI-compatible endpoint. Других LLM-реализаций нет.

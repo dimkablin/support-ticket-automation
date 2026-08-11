@@ -39,8 +39,8 @@ class Settings:
             langfuse_public_key=os.getenv("LANGFUSE_PUBLIC_KEY", ""),
             langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY", ""),
             langfuse_base_url=os.getenv("LANGFUSE_BASE_URL", "http://localhost:3000"),
-            litellm_model=os.getenv("LITELLM_MODEL", "openai/qwen3:8b"),
-            litellm_api_base=os.getenv("LITELLM_API_BASE", "http://localhost:11434/v1"),
-            litellm_api_key=os.getenv("LITELLM_API_KEY", "ollama"),
+            litellm_model=os.getenv("LITELLM_MODEL", "openai/support-llm"),
+            litellm_api_base=os.getenv("LITELLM_API_BASE", "http://localhost:4000/v1"),
+            litellm_api_key=os.getenv("LITELLM_API_KEY", ""),
             confidence_threshold=float(os.getenv("CLASSIFIER_CONFIDENCE_THRESHOLD", "0.22")),
         )

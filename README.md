@@ -12,8 +12,8 @@ Redis; решения пишутся в PostgreSQL и трассируются �
 
 ## Быстрый запуск
 
-Требования: Python 3.12+, uv, Docker Desktop и NVIDIA GPU для существующего
-Ollama Compose.
+Требования: Python 3.12+, uv, Docker Desktop, NVIDIA Container Toolkit и GPU.
+На этой машине Compose настроен для RTX 5070 Ti.
 
 ~~~powershell
 Copy-Item .env.example .env
@@ -23,15 +23,23 @@ uv sync --extra dev
 uv run python scripts/prepare_dataset.py
 uv run python scripts/train_classifier.py
 
-docker compose -f ..\..\docker-compose.ollama.yaml up -d
-docker exec ollama ollama pull qwen3:8b
-docker exec ollama ollama pull bge-m3
+# Укажите LITELLM_* и LIGHTRAG_LLM_MODEL в .env.
+docker compose --env-file .env -f docker-compose.bge-m3.yml up -d
 
 docker compose --env-file .env -f docker-compose.langfuse.yml up -d
 docker compose --env-file .env -f docker-compose.lightrag.yml up -d
 uv run python scripts/index_kb.py
 
 docker compose --env-file .env -f docker-compose.yml up --build -d
+~~~
+
+Первый запуск BGE-M3 скачивает веса в Docker volume. После готовности endpoint
+можно проверить отдельно от LightRAG:
+
+~~~powershell
+$body = @{ model = "BAAI/bge-m3"; input = @("проверка embeddings") } | ConvertTo-Json
+$result = Invoke-RestMethod -Method Post -Uri http://localhost:8081/v1/embeddings -ContentType application/json -Body $body
+$result.data[0].embedding.Count  # ожидается 1024
 ~~~
 
 Интерфейс: <http://localhost:8501>, Langfuse: <http://localhost:3000>,
@@ -59,7 +67,7 @@ benchmark/results/.
 Текущий воспроизводимый classifier-only результат на test: accuracy 0.75,
 macro-F1 0.745, Top-3 accuracy 0.933, high-risk recall 1.0, auto-close
 precision 1.0, p95 горячего пути около 1.4 мс. Live-RAG метрики требуют
-запущенных Ollama и LightRAG и поэтому не подменены фиктивными числами.
+запущенных BGE-M3, LiteLLM и LightRAG и поэтому не подменены фиктивными числами.
 
 ## Экономика
 
@@ -87,9 +95,8 @@ precision 1.0, p95 горячего пути около 1.4 мс. Live-RAG ме�
 - kb/*.md — 12 русских документов для LightRAG;
 - src/support_automation/ — адаптеры, классификатор, policy, интеграции и pipeline;
 - streamlit_app.py — выбор канала, устройства, готового примера и провайдера;
-- три независимых Compose: приложение, LightRAG и Langfuse.
+- четыре независимых Compose: приложение, BGE-M3, LightRAG и Langfuse.
 
 Архитектура и ограничения описаны в [docs/architecture.md](docs/architecture.md),
 ML — в [docs/ml.md](docs/ml.md), эксплуатация — в
 [docs/risks-and-ops.md](docs/risks-and-ops.md).
-

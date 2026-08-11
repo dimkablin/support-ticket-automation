@@ -18,19 +18,21 @@ services:
       LIGHTRAG_API_KEY: ${LIGHTRAG_API_KEY:?Set LIGHTRAG_API_KEY in .env}
       SUMMARY_LANGUAGE: ${LIGHTRAG_SUMMARY_LANGUAGE:-Russian}
 
-      # Ollama exposes an OpenAI-compatible API on /v1.
+      # Generation and embeddings deliberately use different OpenAI-compatible endpoints.
       LLM_BINDING: openai
-      LLM_BINDING_HOST: ${OLLAMA_OPENAI_BASE_URL:-http://host.docker.internal:11434/v1}
-      LLM_BINDING_API_KEY: ${OLLAMA_API_KEY:-ollama}
-      LLM_MODEL: ${OLLAMA_LLM_MODEL:-qwen3:8b}
+      LLM_BINDING_HOST: ${LITELLM_DOCKER_URL:?Set LITELLM_DOCKER_URL in .env}
+      LLM_BINDING_API_KEY: ${LITELLM_API_KEY:?Set LITELLM_API_KEY in .env}
+      LLM_MODEL: ${LIGHTRAG_LLM_MODEL:?Set LIGHTRAG_LLM_MODEL in .env}
       MAX_TOTAL_TOKENS: ${LIGHTRAG_MAX_TOTAL_TOKENS:-12000}
 
       EMBEDDING_BINDING: openai
-      EMBEDDING_BINDING_HOST: ${OLLAMA_OPENAI_BASE_URL:-http://host.docker.internal:11434/v1}
-      EMBEDDING_BINDING_API_KEY: ${OLLAMA_API_KEY:-ollama}
-      EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-bge-m3}
-      EMBEDDING_DIM: ${OLLAMA_EMBEDDING_DIM:-1024}
+      EMBEDDING_BINDING_HOST: ${BGE_M3_DOCKER_URL:-http://host.docker.internal:8081/v1}
+      EMBEDDING_BINDING_API_KEY: ${BGE_M3_API_KEY:-local}
+      EMBEDDING_MODEL: ${BGE_M3_MODEL:-BAAI/bge-m3}
+      EMBEDDING_DIM: ${BGE_M3_DIM:-1024}
+      EMBEDDING_TOKEN_LIMIT: ${BGE_M3_TOKEN_LIMIT:-8192}
       EMBEDDING_SEND_DIM: "false"
+      EMBEDDING_USE_BASE64: "false"
 
       # LightRAG traces OpenAI-compatible calls to the separate Langfuse stack.
       LANGFUSE_ENABLE_TRACE: ${LANGFUSE_ENABLE_TRACE:-true}

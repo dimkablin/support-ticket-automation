@@ -95,9 +95,9 @@ def main() -> None:
             FakeLLM()
             if args.provider == "fake"
             else LiteLLMProvider(
-                os.getenv("LITELLM_MODEL", "openai/qwen3:8b"),
-                os.getenv("LITELLM_API_BASE", "http://localhost:11434/v1"),
-                os.getenv("LITELLM_API_KEY", "ollama"),
+                os.getenv("LITELLM_MODEL", "openai/support-llm"),
+                os.getenv("LITELLM_API_BASE", "http://localhost:4000/v1"),
+                os.getenv("LITELLM_API_KEY", ""),
             )
         )
         ranks: list[float] = []
